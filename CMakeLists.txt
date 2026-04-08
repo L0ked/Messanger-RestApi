@@ -57,12 +57,16 @@ add_executable(MessagerV1 main.cpp
         src/service/MessageService.h
         src/handler/MessageHandler.cpp
         src/handler/MessageHandler.h
+        src/migrations/Migrator.h
+        src/helpers/PasswordHasher.h
 )
 
 # Добавляем пути к заголовочным файлам
 target_include_directories(MessagerV1 PRIVATE
         "C:/vcpkg/installed/x64-mingw-dynamic/include"
 )
+find_package(unofficial-sodium CONFIG REQUIRED)
+target_link_libraries(MessagerV1 unofficial-sodium::sodium)
 
 # Подключаем системные библиотеки Windows
 target_link_libraries(MessagerV1 ws2_32 mswsock)
@@ -76,14 +80,11 @@ target_link_libraries(MessagerV1
         "C:/vcpkg/installed/x64-mingw-dynamic/lib/libsoci_postgresql_4_0.dll.a"
 )
 
-# Crow часто является header-only библиотекой, поэтому не требует линковки
-# Проверяем есть ли заголовки Crow
-if(EXISTS "C:/vcpkg/installed/x64-mingw-dynamic/include/crow.h")
-    message(STATUS "Crow headers found - using header-only mode")
-    # Crow header-only, дополнительных библиотек не нужно
-else()
-    message(FATAL_ERROR "Crow headers not found. Please install: vcpkg install crow:x64-mingw-dynamic")
-endif()
+add_custom_command(TARGET MessagerV1 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/migrations
+        $<TARGET_FILE_DIR:MessagerV1>/migrations
+)
 
 # Компилятор флаги для Windows
 if(WIN32)

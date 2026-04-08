@@ -101,7 +101,7 @@ crow::response UserHandler::change_password(const crow::request &req) {
 
         auto user = this->_service->getById(id);
 
-        if (user->password != old_password) {
+        if (!user.has_value() || !PasswordHasher::verify(old_password, user->password)) {
             return error_response(401, "Incorrect password");
         }
 

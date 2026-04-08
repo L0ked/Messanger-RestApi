@@ -104,7 +104,7 @@ std::optional<Session> AuthService::login(std::string username, std::string pass
             this->_log->debug("Session not created, not found user");
             return std::nullopt;
         }
-        if (user->password != password) {
+        if (!PasswordHasher::verify(password, user->password)) {
             this->_log->debug("Incorrect password by username = {}", username);
             return std::nullopt;
         }

@@ -4,15 +4,18 @@
 #include <memory>
 
 #include "logger/Logger.h"
+#include "migrations/Migrator.h"
 #include "service/FactoryService.h"
 #include "handler/FactoryHandler.h"
 #include "middleware/AuthMiddleware.h"
 
 int main() {
     auto logger = logger::create("main", spdlog::level::debug);
+    PasswordHasher::init();
 
     try {
         soci::session sql("postgresql", "dbname=MessengerTest user=postgres password=Wowa+ host=localhost");
+        runMigrations(sql, "migrations", logger);
 
         auto serviceFactory = createServiceFactory(sql, logger);
 
@@ -33,15 +36,6 @@ int main() {
         authHandler->registerRouters(app);
         chatHandler->registerRouters(app);
         messageHandler->registerRouters(app);
-
-        CROW_ROUTE(app, "/<path>").methods(crow::HTTPMethod::OPTIONS)
-        ([](const crow::request& req, const std::string& path) {
-            crow::response res(200);
-            res.add_header("Access-Control-Allow-Origin", "*");
-            res.add_header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
-            res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            return res;
-        });
 
         logger->info("Starting server on port 8080");
         app.port(8080).multithreaded().run();

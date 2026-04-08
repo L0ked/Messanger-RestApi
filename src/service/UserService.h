@@ -7,6 +7,7 @@
 #include "repository/IUserRepository.h"
 #include "logger/Logger.h"
 
+#include "helpers/PasswordHasher.h"
 #include "exceptions/repository_exceptions.h"
 #include "exceptions/service_exceptions.h"
 

@@ -3,6 +3,7 @@
 
 #include "repository/ISessionRepository.h"
 #include "service/UserService.h"
+#include "helpers/PasswordHasher.h"
 #include "logger/Logger.h"
 
 class AuthService {

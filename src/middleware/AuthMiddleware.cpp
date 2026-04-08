@@ -2,6 +2,10 @@
 
 void AuthMiddleware::before_handle(crow::request &req, crow::response &res, context &ctx) {
 
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+    res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
     std::vector<std::string> public_paths = {
         "/register",
         "/login",

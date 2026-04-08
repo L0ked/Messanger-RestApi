@@ -31,7 +31,7 @@ std::optional<User> UserService::getByUsername(std::string username) {
 
 User UserService::create(std::string username, std::string password, std::string display_name) {
     try {
-        User user(0, username,password,display_name, std::time(nullptr));
+        User user(0, username, PasswordHasher::hash(password),display_name, std::time(nullptr));
         int id = this->_repository->create(user);
 
         this->_log->info("Created user with id = {}", id);
@@ -49,7 +49,7 @@ User UserService::create(std::string username, std::string password, std::string
 
 void UserService::update_password(int id, std::string new_password) {
     try {
-        this->_repository->update_password(id, new_password);
+        this->_repository->update_password(id, PasswordHasher::hash(new_password));
         this->_log->info("Update password with id = {}", id);
     } catch (const soci::soci_error &ex) {
         this->_log->error("Error Database: {}", ex.what());
